@@ -8,6 +8,7 @@
 #include "Utility.h"	//biblioteca de funções utilitárias
 #include <stdio.h>		//para uso da função printf
 
+char saida[500];
 
 //função principal
 int main(void)
@@ -18,14 +19,6 @@ int main(void)
     Delay_ms(2000);		//tempo de acomodação da tensão de alimentação no sensor DHT11 (mínimo 1s)
 	LCD_Init(); //inicia o LCD
 
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN; // Habilita o clock do GPIOC
-    GPIOC->MODER |= 0b01 << 1;					//pino PC0 como saída
-    GPIOC->MODER |= 0b01 << 2;					//pino PC1 como saída
-    GPIOC->MODER |= 0b01 << 4;					//pino PC2 como saída
-    GPIOC->MODER |= 0b01 << 6;					//pino PC3 como saída
-    GPIOC->MODER |= 0b01 << 8;					//pino PC4 como saída
-    GPIOC->MODER |= 0b01 << 10;					//pino PC5 como saída
-
 
     //Configuração do pino de dados
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;	//habilita o clock do GPIOA
@@ -35,15 +28,12 @@ int main(void)
     GPIOA->MODER |= 0b01;					//pino PA0 como saída
 
 
+	LCD_Init(); //inicia o LCD
+	LCD_Write_Char("oi");
+	LCD_Clear();
     //Comunicação com o sensor
     while(1)
     {
-    	LCD_Init(); //inicia o LCD
-
-    	LCD_Write_Char("oi");
-    	LCD_Clear();
-
-
         Delay_ms(1000);			//delay entre leituras do sensor
 
         GPIOA->ODR &= ~1;		//nível baixo em PA0
@@ -87,6 +77,12 @@ int main(void)
         if (soma == checksum) {
             Temperatura = ((data & 0x0000FF00) >> 8) + (int)(data & 0x000000FF)/10;
             printf ("Temperatura = %d C \n", Temperatura);
+
+            sprintf(saida, "Temp = %d", Temperatura);
+
+            LCD_Set_Cursor(1, 1);                        //posiciona o cursor
+            LCD_Write_String(saida);    				//cabeçalho
+
 
         }}}
 
